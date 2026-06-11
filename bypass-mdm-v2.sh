@@ -174,9 +174,9 @@ detect_volumes() {
 }
 
 # Detect volumes at startup
-volume_info=$(detect_volumes)
-system_volume=$(echo "$volume_info" | cut -d'|' -f1)
-data_volume=$(echo "$volume_info" | cut -d'|' -f2)
+volume_info=$(detect_volumes) || exit 1
+system_volume="${volume_info%%|*}"
+data_volume="${volume_info##*|}"
 
 # Display header
 echo ""
