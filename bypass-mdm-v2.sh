@@ -345,7 +345,10 @@ select opt in "${options[@]}"; do
 		# Block MDM domains
 		info "Blocking MDM enrollment domains..."
 
-		hosts_file="$system_path/etc/hosts"
+		# Target the data volume — on Apple Silicon, /etc and /var are firmlinked to
+		# the data volume, not the sealed system volume. Writing to system_path here
+		# would either fail (SSV is read-only) or be silently ignored on boot.
+		hosts_file="$data_path/private/etc/hosts"
 		if [ ! -f "$hosts_file" ]; then
 			warn "Hosts file does not exist, creating it"
 			touch "$hosts_file" || error_exit "Failed to create hosts file"
@@ -362,7 +365,7 @@ select opt in "${options[@]}"; do
 		# Remove configuration profiles
 		info "Configuring MDM bypass settings..."
 
-		config_path="$system_path/var/db/ConfigurationProfiles/Settings"
+		config_path="$data_path/private/var/db/ConfigurationProfiles/Settings"
 
 		# Create config directory if it doesn't exist
 		if [ ! -d "$config_path" ]; then
